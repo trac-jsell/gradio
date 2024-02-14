@@ -30,8 +30,10 @@
 	export let bokeh_version: string | null;
 	export let gradio: Gradio<{
 		change: never;
+		click: any;
 	}>;
 	export let show_actions_button = false;
+
 </script>
 
 <Block
@@ -62,5 +64,6 @@
 		{bokeh_version}
 		{show_actions_button}
 		on:change={() => gradio.dispatch("change")}
+		on:click={({ detail }) => gradio.dispatch('click', detail)}
 	/>
 </Block>

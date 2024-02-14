@@ -3,12 +3,13 @@
 	import Plotly from "plotly.js-dist-min";
 	import { Plot as PlotIcon } from "@gradio/icons";
 	import { colors as color_palette, ordered_colors } from "@gradio/theme";
-	import { get_next_color } from "@gradio/utils";
+	import { get_next_color, type PlotSelectData } from "@gradio/utils";
 	import { Vega } from "svelte-vega";
 	import { afterUpdate, beforeUpdate, onDestroy } from "svelte";
 	import { create_config, bar_plot_header_encoding } from "./utils";
 	import { Empty } from "@gradio/atoms";
 	import type { ThemeMode } from "js/app/src/components/types";
+	import { createEventDispatcher } from 'svelte';
 
 	export let value;
 	export let target;
@@ -19,6 +20,12 @@
 	export let bokeh_version: string | null;
 	export let show_actions_button: bool;
 	const div_id = `bokehDiv-${Math.random().toString(5).substring(2)}`;
+
+
+	// Used to emite events to parents.
+	const dispatch = createEventDispatcher<{
+		click: PlotSelectData;
+	}>();
 
 	function get_color(index: number): string {
 		let current_color = colors[index % colors.length];
@@ -157,7 +164,15 @@
 			plotObj.layout.title
 				? (plotObj.layout.margin = { autoexpand: true })
 				: (plotObj.layout.margin = { l: 0, r: 0, b: 0, t: 0 });
+			
 			Plotly.react(plot_div, plotObj);
+
+			// Emit an event when the plot is clicked.
+			plot_div.removeAllListeners('plotly_click') // Remove any existing listeners to preven mult. fires.
+			plot_div.on('plotly_click', function(data) {
+				const pointData = data.points || []
+				dispatch('click', {pointData: (pointData as PlotSelectData).map((x) => x.data)})
+			})
 		}
 	});
 
@@ -168,7 +183,6 @@
 		}
 	});
 </script>
-
 {#if value && type == "plotly"}
 	<div data-testid={"plotly"} bind:this={plot_div} />
 {:else if type == "bokeh"}

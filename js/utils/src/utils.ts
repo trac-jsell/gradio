@@ -5,6 +5,12 @@ export interface SelectData {
 	selected?: boolean;
 }
 
+export type PlotSelectData = {
+	pointData: Array<{
+		data: Record<any, any>;
+	}>
+}
+
 export interface LikeData {
 	index: number | [number, number];
 	value: any;
@@ -161,9 +167,8 @@ export const format_time = (seconds: number): string => {
 	const minutes = Math.floor((seconds % 3600) / 60);
 	const seconds_remainder = Math.round(seconds) % 60;
 	const padded_minutes = `${minutes < 10 ? "0" : ""}${minutes}`;
-	const padded_seconds = `${
-		seconds_remainder < 10 ? "0" : ""
-	}${seconds_remainder}`;
+	const padded_seconds = `${seconds_remainder < 10 ? "0" : ""
+		}${seconds_remainder}`;
 
 	if (hours > 0) {
 		return `${hours}:${padded_minutes}:${padded_seconds}`;
@@ -172,6 +177,7 @@ export const format_time = (seconds: number): string => {
 };
 
 export type I18nFormatter = any;
+
 export class Gradio<T extends Record<string, any> = Record<string, any>> {
 	#id: number;
 	theme: string;

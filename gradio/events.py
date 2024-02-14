@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import dataclasses
 from functools import partial, wraps
-from typing import TYPE_CHECKING, Any, Callable, Literal, Sequence
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Literal, Sequence
 
 from gradio_client.documentation import document
 from jinja2 import Template
@@ -121,6 +121,13 @@ class SelectData(EventData):
         True if the item was selected, False if deselected.
         """
 
+class PlotSelectData(EventData):
+    def __init__(self, target: Block | None, data: Any):
+        super().__init__(target, data)
+        self.pointData: List[Dict[str, Any]] = data["pointData"]
+        """
+        The plot point selection data. 
+        """
 
 class KeyUpData(EventData):
     def __init__(self, target: Block | None, data: Any):
@@ -274,6 +281,7 @@ class EventListener(str):
 
                     @wraps(func)
                     def inner(*args, **kwargs):
+                        
                         return func(*args, **kwargs)
 
                     return inner
